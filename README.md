@@ -1,2 +1,2 @@
 # QT_Cube
-QT Cube
+First task on course of Computer science PhF NSU 
