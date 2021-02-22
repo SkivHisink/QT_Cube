@@ -15,7 +15,16 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+
+    void on_XSlider_valueChanged(int value);
+
+    void on_XSlider_sliderMoved(int position);
+
 private:
     Ui::MainWindow *ui;
+    int prev_x_pos=0;
+    int prev_y_pos=0;
+    int prev_z_pos=0;
 };
 #endif // MAINWINDOW_H

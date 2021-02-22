@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>849</width>
+    <width>985</width>
     <height>600</height>
    </rect>
   </property>
@@ -24,13 +24,52 @@
      </rect>
     </property>
    </widget>
+   <widget class="QSlider" name="XSlider">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>10</y>
+      <width>301</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QSlider" name="YSlider">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>30</y>
+      <width>301</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QSlider" name="ZSlider">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>50</y>
+      <width>301</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>849</width>
+     <width>985</width>
      <height>20</height>
     </rect>
    </property>
@@ -41,7 +80,7 @@
   <customwidget>
    <class>OpenGLWidget</class>
    <extends>QWidget</extends>
-   <header location="global">openglwidget.h</header>
+   <header>openglwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

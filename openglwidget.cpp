@@ -9,7 +9,44 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 
-#include <QColorDialog>
+static void qNormalizeAngle(int &angle)
+{
+    while (angle < 0)
+        angle += 360 * 16;
+    while (angle > 360 * 16)
+        angle -= 360 * 16;
+}
+
+void OpenGLWidget::setXRotation(int angle)
+{
+    qNormalizeAngle(angle);
+    if (angle != m_xRot) {
+        m_xRot = angle;
+        emit xRotationChanged(angle);
+        update();
+    }
+}
+
+void OpenGLWidget::setYRotation(int angle)
+{
+    qNormalizeAngle(angle);
+    if (angle != m_yRot) {
+        m_yRot = angle;
+        emit yRotationChanged(angle);
+        update();
+    }
+}
+
+void OpenGLWidget::setZRotation(int angle)
+{
+    qNormalizeAngle(angle);
+    if (angle != m_zRot) {
+        m_zRot = angle;
+        emit zRotationChanged(angle);
+        update();
+    }
+}
+
 static const char* vertexShaderSource =
 "attribute highp vec4 posAttr;\n"
 "attribute lowp vec4 colAttr;\n"
@@ -123,12 +160,15 @@ void OpenGLWidget::paintGL()
     glCullFace(GL_BACK);//GL_BACK
     ////good to add later glPolygonMode(GL_FRONT, GL_LINE); and smthing like this
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glPolygonMode(GL_FRONT, GL_FILL);
+   // glPolygonMode(GL_FRONT, GL_FILL);
     m_program->bind();
     QMatrix4x4 matrix;
     matrix.perspective(vertical_angle, aspectRatio, 0.1f, 100.0f);
     matrix.translate(x_coord, y_coord, z_coord);
     matrix.rotate(rotation);
+    matrix.rotate(180.0f - (m_xRot / 16.0f), 1, 0, 0);
+    matrix.rotate(m_yRot / 16.0f, 0, 1, 0);
+    matrix.rotate(m_zRot / 16.0f, 0, 0, 1);
     //keyEvent
     keyevent();
     for (int i = 0; i < 8; ++i)

@@ -1,0 +1,200 @@
+/********************************************************************************
+** Form generated from reading UI file 'mainwindow.ui'
+**
+** Created by: Qt User Interface Compiler version 5.15.2
+**
+** WARNING! All changes made in this file will be lost when recompiling UI file!
+********************************************************************************/
+
+#ifndef UI_MAINWINDOW_H
+#define UI_MAINWINDOW_H
+
+#include <QtCore/QVariant>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QStatusBar>
+#include <QtWidgets/QWidget>
+#include "openglwidget.h"
+
+QT_BEGIN_NAMESPACE
+
+class Ui_MainWindow
+{
+public:
+    QWidget *centralwidget;
+    OpenGLWidget *widget;
+    QSlider *XSlider;
+    QSlider *YSlider;
+    QSlider *ZSlider;
+    QMenuBar *menubar;
+    QStatusBar *statusbar;
+    void changeSlider(QSlider *slider)
+    {
+        slider->setRange(0, 360 * 16);
+        slider->setSingleStep(16);
+        slider->setPageStep(15 * 16);
+        slider->setTickInterval(15 * 16);
+    }
+    void setupUi(QMainWindow *MainWindow)
+    {
+        if (MainWindow->objectName().isEmpty())
+            MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
+        MainWindow->resize(985, 600);
+        centralwidget = new QWidget(MainWindow);
+        centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
+        widget = new OpenGLWidget(centralwidget);
+        widget->setObjectName(QString::fromUtf8("widget"));
+        widget->setGeometry(QRect(10, 0, 641, 561));
+        XSlider = new QSlider(centralwidget);
+        XSlider->setObjectName(QString::fromUtf8("XSlider"));
+        XSlider->setGeometry(QRect(660, 10, 301, 16));
+        XSlider->setOrientation(Qt::Horizontal);
+        changeSlider(XSlider);
+        YSlider = new QSlider(centralwidget);
+        YSlider->setObjectName(QString::fromUtf8("YSlider"));
+        YSlider->setGeometry(QRect(660, 40, 301, 16)/********************************************************************************
+        ** Form generated from reading UI file 'mainwindow.ui'
+        **
+        ** Created by: Qt User Interface Compiler version 5.15.2
+        **
+        ** WARNING! All changes made in this file will be lost when recompiling UI file!
+        ********************************************************************************/
+
+        #ifndef UI_MAINWINDOW_H
+        #define UI_MAINWINDOW_H
+
+        #include <QtCore/QVariant>
+        #include <QtWidgets/QApplication>
+        #include <QtWidgets/QMainWindow>
+        #include <QtWidgets/QMenuBar>
+        #include <QtWidgets/QSlider>
+        #include <QtWidgets/QStatusBar>
+        #include <QtWidgets/QWidget>
+        #include "openglwidget.h"
+
+        QT_BEGIN_NAMESPACE
+
+        class Ui_MainWindow
+        {
+        public:
+            QWidget *centralwidget;
+            OpenGLWidget *widget;
+            QSlider *XSlider;
+            QSlider *YSlider;
+            QSlider *ZSlider;
+            QMenuBar *menubar;
+            QStatusBar *statusbar;
+            void changeSlider(QSlider *slider)
+            {
+                slider->setRange(0, 360 * 16);
+                slider->setSingleStep(16);
+                slider->setPageStep(15 * 16);
+                slider->setTickInterval(15 * 16);
+            }
+            void setupUi(QMainWindow *MainWindow)
+            {
+                if (MainWindow->objectName().isEmpty())
+                    MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
+                MainWindow->resize(985, 600);
+                centralwidget = new QWidget(MainWindow);
+                centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
+                widget = new OpenGLWidget(centralwidget);
+                widget->setObjectName(QString::fromUtf8("widget"));
+                widget->setGeometry(QRect(10, 0, 641, 561));
+                XSlider = new QSlider(centralwidget);
+                XSlider->setObjectName(QString::fromUtf8("XSlider"));
+                XSlider->setGeometry(QRect(660, 10, 301, 16));
+                XSlider->setOrientation(Qt::Horizontal);
+                YSlider = new QSlider(centralwidget);
+                YSlider->setObjectName(QString::fromUtf8("YSlider"));
+                YSlider->setGeometry(QRect(660, 30, 301, 16));
+                YSlider->setOrientation(Qt::Horizontal);
+                ZSlider = new QSlider(centralwidget);
+                ZSlider->setObjectName(QString::fromUtf8("ZSlider"));
+                ZSlider->setGeometry(QRect(660, 50, 301, 16));
+                ZSlider->setOrientation(Qt::Horizontal);
+                changeSlider(XSlider);
+                changeSlider(YSlider);
+                changeSlider(ZSlider);
+                QObject::connect(XSlider, &QSlider::valueChanged, widget, &OpenGLWidget::setXRotation);
+                QObject::connect(widget, &OpenGLWidget::xRotationChanged, XSlider, &QSlider::setValue);
+                QObject::connect(YSlider, &QSlider::valueChanged, widget, &OpenGLWidget::setYRotation);
+                QObject::connect(widget, &OpenGLWidget::yRotationChanged, YSlider, &QSlider::setValue);
+                QObject::connect(ZSlider, &QSlider::valueChanged, widget, &OpenGLWidget::setZRotation);
+                QObject::connect(widget, &OpenGLWidget::zRotationChanged, ZSlider, &QSlider::setValue);
+                MainWindow->setCentralWidget(centralwidget);
+                menubar = new QMenuBar(MainWindow);
+                menubar->setObjectName(QString::fromUtf8("menubar"));
+                menubar->setGeometry(QRect(0, 0, 985, 20));
+                MainWindow->setMenuBar(menubar);
+                statusbar = new QStatusBar(MainWindow);
+                statusbar->setObjectName(QString::fromUtf8("statusbar"));
+                MainWindow->setStatusBar(statusbar);
+
+                retranslateUi(MainWindow);
+
+                QMetaObject::connectSlotsByName(MainWindow);
+            } // setupUi
+
+            void retranslateUi(QMainWindow *MainWindow)
+            {
+                MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+            } // retranslateUi
+
+        };
+
+        namespace Ui {
+            class MainWindow: public Ui_MainWindow {};
+        } // namespace Ui
+
+        QT_END_NAMESPACE
+
+        #endif // UI_MAINWINDOW_H
+);
+        YSlider->setOrientation(Qt::Horizontal);
+        changeSlider(YSlider);
+        ZSlider = new QSlider(centralwidget);
+        ZSlider->setObjectName(QString::fromUtf8("ZSlider"));
+        ZSlider->setGeometry(QRect(660, 60, 301, 16));
+        ZSlider->setOrientation(Qt::Horizontal);
+        changeSlider(ZSlider);
+        QObject::connect(XSlider, &QSlider::valueChanged, widget, &OpenGLWidget::setXRotation);
+        QObject::connect(widget, &OpenGLWidget::xRotationChanged, XSlider, &QSlider::setValue);
+        QObject::connect(YSlider, &QSlider::valueChanged, widget, &OpenGLWidget::setYRotation);
+        QObject::connect(widget, &OpenGLWidget::yRotationChanged, YSlider, &QSlider::setValue);
+        QObject::connect(ZSlider, &QSlider::valueChanged, widget, &OpenGLWidget::setZRotation);
+        QObject::connect(widget, &OpenGLWidget::zRotationChanged, ZSlider, &QSlider::setValue);
+        XSlider->setValue(15 * 16);
+        YSlider->setValue(345 * 16);
+        ZSlider->setValue(0 * 16);
+
+        MainWindow->setCentralWidget(centralwidget);
+        menubar = new QMenuBar(MainWindow);
+        menubar->setObjectName(QString::fromUtf8("menubar"));
+        menubar->setGeometry(QRect(0, 0, 985, 20));
+        MainWindow->setMenuBar(menubar);
+        statusbar = new QStatusBar(MainWindow);
+        statusbar->setObjectName(QString::fromUtf8("statusbar"));
+        MainWindow->setStatusBar(statusbar);
+
+        retranslateUi(MainWindow);
+
+        QMetaObject::connectSlotsByName(MainWindow);
+    } // setupUi
+
+    void retranslateUi(QMainWindow *MainWindow)
+    {
+        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+    } // retranslateUi
+
+};
+
+namespace Ui {
+    class MainWindow: public Ui_MainWindow {};
+} // namespace Ui
+
+QT_END_NAMESPACE
+
+#endif // UI_MAINWINDOW_H

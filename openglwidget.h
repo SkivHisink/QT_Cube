@@ -21,7 +21,6 @@ class OpenGLWidget: public QOpenGLWidget, protected QOpenGLFunctions
 public:
     using QOpenGLWidget::QOpenGLWidget;
     ~OpenGLWidget();
-
 protected:
    void mousePressEvent(QMouseEvent *e) override;
    void mouseReleaseEvent(QMouseEvent *e) override;
@@ -35,6 +34,15 @@ protected:
   //  void initShaders();
   //  void initTextures();
     void keyevent();
+public slots:
+    void setXRotation(int angle);
+    void setYRotation(int angle);
+    void setZRotation(int angle);
+
+signals:
+    void xRotationChanged(int angle);
+    void yRotationChanged(int angle);
+    void zRotationChanged(int angle);
 private:
     QBasicTimer timer;
 
@@ -54,6 +62,9 @@ private:
     float x_coord=0;
     float y_coord=0;
     float z_coord=-4;
+    int m_xRot = 0;
+    int m_yRot = 0;
+    int m_zRot = 0;
     QOpenGLBuffer arrayBuf;
     QOpenGLBuffer indexBuf;
     QOpenGLVertexArrayObject* vao;
