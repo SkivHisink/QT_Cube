@@ -28,4 +28,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    ui_temp.txt
+    fragment.fsh \
+    geometry.gsh \
+    ui_temp.txt \
+    vertex.vsh

@@ -21,6 +21,12 @@ class OpenGLWidget: public QOpenGLWidget, protected QOpenGLFunctions
 public:
     using QOpenGLWidget::QOpenGLWidget;
     ~OpenGLWidget();
+
+    float prop = 0.0;
+    int morph_type = 0;
+    bool figure_fill=true;
+    bool figure_line=false;
+    bool dc_state=true;
 protected:
    void mousePressEvent(QMouseEvent *e) override;
    void mouseReleaseEvent(QMouseEvent *e) override;
@@ -43,11 +49,15 @@ signals:
     void xRotationChanged(int angle);
     void yRotationChanged(int angle);
     void zRotationChanged(int angle);
+
+
 private:
+    void middle_point(int i, int j, int* max_indx);
     QBasicTimer timer;
 
     GLint m_posAttr = 0;
     GLint m_colAttr = 0;
+    GLint m_geom=0;
     GLint m_matrixUniform = 0;
     GLfloat color_change=0.0f;
     QOpenGLShaderProgram *m_program = nullptr;
@@ -72,6 +82,7 @@ private:
     Cube cube;
     //keycontrol
     std::vector<bool> pressed_button;
+
 };
 
 #endif // OPENGLWIDGET_H

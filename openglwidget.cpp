@@ -46,33 +46,41 @@ void OpenGLWidget::setZRotation(int angle)
         update();
     }
 }
+void OpenGLWidget::middle_point(int i, int j, int* max_indx)
+{
+    auto& vert=cube.vertices;
+    auto ver_1_1=vert[(i)*6+0];
+    auto ver_1_2=vert[(j)*6+0];
+    auto ver_2_1=vert[(i)*6+1];
+    auto ver_2_2=vert[(j)*6+1];
+    auto ver_3_1=vert[(i)*6+2];
+    auto ver_3_2=vert[(j)*6+2];
 
-static const char* vertexShaderSource =
-"attribute highp vec4 posAttr;\n"
-"attribute lowp vec4 colAttr;\n"
-"varying lowp vec4 col;\n"
-"uniform highp mat4 matrix;\n"
-"void main() {\n"
-"   col = colAttr;\n"
-"   gl_Position = matrix * posAttr;\n"
-"}\n";
+        vert.push_back((ver_1_1+ver_1_2)/2);
+        vert.push_back((ver_2_1+ver_2_2)/2);
+        vert.push_back((ver_3_1+ver_3_2)/2);
+        vert.push_back(abs(vert[(i)*6+3]+vert[(j)*6+3])/2);
+        vert.push_back(abs(vert[(i)*6+4]+vert[(j)*6+4])/2);
+        vert.push_back(abs(vert[(i)*6+5]+vert[(j)*6+5])/2);
 
-static const char* fragmentShaderSource =
-"varying lowp vec4 col;\n"
-"void main() {\n"
-"   gl_FragColor = col;\n"
-"}\n";
-
+    ++*max_indx;
+}
+int number_of_triangle_breaking(int num)
+{
+    int numb=0;
+    for(int i=0;i<num;++i){
+        numb=numb+static_cast<int>(6*pow(2, 2*i+1));
+    }
+    return numb;
+}
 void OpenGLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
-    //
-
-    //
     setFocusPolicy(Qt::StrongFocus);
     m_program = new QOpenGLShaderProgram(this);
-    m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource);
-    m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
+    m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "C:\\Users\\Skiv2\\Documents\\GitHub\\QT_Cube\\vertex.vsh");
+    m_program->addShaderFromSourceFile(QOpenGLShader::Geometry, "C:\\Users\\Skiv2\\Documents\\GitHub\\QT_Cube\\geometry.gsh");
+    m_program->addShaderFromSourceFile(QOpenGLShader::Fragment,"C:\\Users\\Skiv2\\Documents\\GitHub\\QT_Cube\\fragment.fsh");
     m_program->link();
     m_posAttr = m_program->attributeLocation("posAttr");
     Q_ASSERT(m_posAttr != -1);
@@ -80,10 +88,43 @@ void OpenGLWidget::initializeGL()
     Q_ASSERT(m_colAttr != -1);
     m_matrixUniform = m_program->uniformLocation("matrix");
     Q_ASSERT(m_matrixUniform != -1);
+    m_program->log();
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
+    //
+   // int num=3;
+    int max_indx=8;
+    auto& indxs= cube.indices;
+    //!create new vector!
+    int numb_of_crop=number_of_triangle_breaking(4);//12 |60|252|1020|formula: prev+6*2^(iter_num+2)
+    for(int i=0;i<numb_of_crop;++i){
+        middle_point(indxs[i*3+0],indxs[i*3+1],&max_indx);
+        middle_point(indxs[i*3+0],indxs[i*3+2],&max_indx);
+        middle_point(indxs[i*3+1],indxs[i*3+2],&max_indx);
+        //
+        cube.indices.push_back(indxs[i*3+0]);
+        cube.indices.push_back(max_indx-3);
+        cube.indices.push_back(max_indx-2);
+             //
+             cube.indices.push_back(max_indx-3);
+             cube.indices.push_back(indxs[i*3+1]);
+             cube.indices.push_back(max_indx-1);
+                 //
+                 cube.indices.push_back(max_indx-1);
+                 cube.indices.push_back(max_indx-2);
+                 cube.indices.push_back(max_indx-3);
+                      //
+                      cube.indices.push_back(max_indx-2);
+                      cube.indices.push_back(max_indx-1);
+                      cube.indices.push_back(indxs[i*3+2]);
 
-
+    }
+    for(int i=0;i<numb_of_crop;++i){
+       cube.indices[i*3+0]=0;
+       cube.indices[i*3+1]=0;
+       cube.indices[i*3+2]=0;
+    }
+    //
     vao = new QOpenGLVertexArrayObject(this);
     vao->create();
     vao->bind();
@@ -107,6 +148,7 @@ void OpenGLWidget::initializeGL()
     m_program->setAttributeBuffer(m_colAttr, GL_FLOAT, 3 * sizeof(float), 3, 6 * sizeof(float));
     //key control
     pressed_button.assign(60, false);
+
 }
 
 void OpenGLWidget::mousePressEvent(QMouseEvent* e)
@@ -154,13 +196,22 @@ void OpenGLWidget::timerEvent(QTimerEvent*)
 void OpenGLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if(dc_state){
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    //glDisable(GL_POLYGON_OFFSET_FILL);
     glCullFace(GL_BACK);//GL_BACK
-    ////good to add later glPolygonMode(GL_FRONT, GL_LINE); and smthing like this
+    }
+    else{
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+    }
+    if(figure_fill){
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+    if(figure_line){
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-   // glPolygonMode(GL_FRONT, GL_FILL);
+    }
+    glShadeModel(GL_SMOOTH);
     m_program->bind();
     QMatrix4x4 matrix;
     matrix.perspective(vertical_angle, aspectRatio, 0.1f, 100.0f);
@@ -171,6 +222,7 @@ void OpenGLWidget::paintGL()
     matrix.rotate(m_zRot / 16.0f, 0, 0, 1);
     //keyEvent
     keyevent();
+    if(color_change!=0){
     for (int i = 0; i < 8; ++i)
     {
         cube.vertices[i * 6 + 3] += color_change;
@@ -178,11 +230,19 @@ void OpenGLWidget::paintGL()
         cube.vertices[i * 6 + 5] += color_change;
     }
     color_change = 0;
+
+    }
     m_program->setUniformValue(m_matrixUniform, matrix);
+    m_program->setUniformValue("radius", 2.0f);
+    m_program->setUniformValue("morphForce", prop);
+    m_program->setUniformValue("morph_type", morph_type);
+    //m_program->setUniformValue("color", QColor(255,0,0));
+
     vao->bind();
     arrayBuf.write(0, cube.vertices.data(), cube.vertices.size() * sizeof(float));
 
-    glDrawElements(GL_TRIANGLES, 12 * 3, GL_UNSIGNED_SHORT, 0);
+    glDrawElements(GL_TRIANGLES, cube.indices.size(), GL_UNSIGNED_SHORT, 0);
+
     vao->release();
     m_program->release();
 
@@ -427,7 +487,7 @@ void OpenGLWidget::keyevent()
     }
     if (pressed_button[24])//1 is red
     {
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < cube.vertices.size()/6; ++i)
         {
             cube.vertices[i * 6 + 3] = 1;
             cube.vertices[i * 6 + 4] = 0;
@@ -436,7 +496,7 @@ void OpenGLWidget::keyevent()
     }
     if (pressed_button[25])//2 is green
     {
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < cube.vertices.size()/6; ++i)
         {
             cube.vertices[i * 6 + 3] = 0;
             cube.vertices[i * 6 + 4] = 1;
@@ -445,7 +505,7 @@ void OpenGLWidget::keyevent()
     }
     if (pressed_button[26])//3 is blue
     {
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < cube.vertices.size()/6; ++i)
         {
             cube.vertices[i * 6 + 3] = 0;
             cube.vertices[i * 6 + 4] = 0;
@@ -454,7 +514,7 @@ void OpenGLWidget::keyevent()
     }
     if (pressed_button[27])//4 is aqua
     {
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < cube.vertices.size()/6; ++i)
         {
             cube.vertices[i * 6 + 3] = 0;
             cube.vertices[i * 6 + 4] = 1;
@@ -463,7 +523,7 @@ void OpenGLWidget::keyevent()
     }
     if (pressed_button[28])//5 is pink
     {
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < cube.vertices.size()/6; ++i)
         {
             cube.vertices[i * 6 + 3] = 1;
             cube.vertices[i * 6 + 4] = 0;
@@ -472,7 +532,7 @@ void OpenGLWidget::keyevent()
     }
     if (pressed_button[29])//6 is yellow
     {
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < cube.vertices.size()/6; ++i)
         {
             cube.vertices[i * 6 + 3] = 1;
             cube.vertices[i * 6 + 4] = 1;
@@ -481,7 +541,7 @@ void OpenGLWidget::keyevent()
     }
     if (pressed_button[30])//7 is black and white
     {
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < cube.vertices.size()/6; ++i)
         {
             cube.vertices[i * 6 + 3] = (float)i / 8;
             cube.vertices[i * 6 + 4] = (float)i / 8;
@@ -490,7 +550,7 @@ void OpenGLWidget::keyevent()
     }
     if (pressed_button[31])//8 is inverse black and white
     {
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < cube.vertices.size()/6; ++i)
         {
             cube.vertices[i * 6 + 3] = 1.0 - (float)i / 8;
             cube.vertices[i * 6 + 4] = 1.0 - (float)i / 8;
@@ -499,7 +559,7 @@ void OpenGLWidget::keyevent()
     }
     if (pressed_button[32])//9 is color inversion
     {
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < cube.vertices.size()/6; ++i)
         {
             cube.vertices[i * 6 + 3] = 1.0 - cube.vertices[i * 6 + 3];
             cube.vertices[i * 6 + 4] = 1.0 - cube.vertices[i * 6 + 4];
@@ -512,7 +572,7 @@ void OpenGLWidget::keyevent()
         int a = 0;
         int b = 0;
         int c = 0;
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < cube.vertices.size()/6; ++i)
         {
             cube.vertices[i * 6 + 5] = a;
             cube.vertices[i * 6 + 4] = b;
