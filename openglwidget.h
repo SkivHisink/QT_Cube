@@ -15,18 +15,44 @@
 
 #include <QSlider>
 
+#include <chrono>
+
 class OpenGLWidget: public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 public:
     using QOpenGLWidget::QOpenGLWidget;
     ~OpenGLWidget();
-
-    float prop = 0.0;
-    int morph_type = 0;
-    bool figure_fill=true;
-    bool figure_line=false;
-    bool dc_state=true;
+    void setProp(const double prop_n){
+        prop = prop_n;
+    }
+    void setMorphType(const int mt_n){
+        morph_type=mt_n;
+    }
+    void setFigureFill(const bool fill_n){
+        figure_fill=fill_n;
+    }
+    void setFigureLine(const bool line_n){
+        figure_line =line_n;
+    }
+    void setDepthState(const bool depth_n){
+        depth_state=depth_n;
+    }
+    void setCullingState(const bool cull_n){
+        culling_state=cull_n;
+    }
+    double getFPS(){
+        return fps;
+    }
+    void setNumberOfObjectsX(const int val_n){
+        nox=val_n;
+    }
+    void setNumberOfObjectsY(const int val_n){
+        noy=val_n;
+    }
+    void setNumberOfObjectsZ(const int val_n){
+        noz=val_n;
+    }
 protected:
    void mousePressEvent(QMouseEvent *e) override;
    void mouseReleaseEvent(QMouseEvent *e) override;
@@ -44,12 +70,12 @@ public slots:
     void setXRotation(int angle);
     void setYRotation(int angle);
     void setZRotation(int angle);
-
+    void updateFPS();
 signals:
     void xRotationChanged(int angle);
     void yRotationChanged(int angle);
     void zRotationChanged(int angle);
-
+    void showFPS();
 
 private:
     void middle_point(int i, int j, int* max_indx);
@@ -59,6 +85,7 @@ private:
     GLint m_colAttr = 0;
     GLint m_geom=0;
     GLint m_matrixUniform = 0;
+    GLint m_matrixTrate = 0;
     GLfloat color_change=0.0f;
     QOpenGLShaderProgram *m_program = nullptr;
     QVector2D mousePressPosition;
@@ -80,9 +107,21 @@ private:
     QOpenGLVertexArrayObject* vao;
     //
     Cube cube;
+    //
+    float prop = 0.0;
+    int morph_type = 0;
+    bool figure_fill = true;
+    bool figure_line = false;
+    bool depth_state = true;
+    bool culling_state = true;
     //keycontrol
     std::vector<bool> pressed_button;
-
+    //
+    double fps = 0.0;
+    std::chrono::high_resolution_clock::time_point begin;
+    int nox=1;
+    int noy=1;
+    int noz=1;
 };
 
 #endif // OPENGLWIDGET_H

@@ -16,6 +16,8 @@ uniform mat4 matrix;
 uniform float radius;
 uniform float morphForce;
 uniform int morph_type;
+//
+uniform mat4 trate;
 out vec4 colour;
 //in vec4 colour;
 //out vec4 coloured;
@@ -50,7 +52,7 @@ void main()
 
     for(int i = 0; i < current; ++i)
     {
-        gl_Position = matrix * vertex[i];
+        gl_Position = matrix * trate * vertex[i];
         EmitVertex();
     }
     EndPrimitive();

@@ -75,6 +75,7 @@ int number_of_triangle_breaking(int num)
 }
 void OpenGLWidget::initializeGL()
 {
+
     initializeOpenGLFunctions();
     setFocusPolicy(Qt::StrongFocus);
     m_program = new QOpenGLShaderProgram(this);
@@ -88,6 +89,8 @@ void OpenGLWidget::initializeGL()
     Q_ASSERT(m_colAttr != -1);
     m_matrixUniform = m_program->uniformLocation("matrix");
     Q_ASSERT(m_matrixUniform != -1);
+    m_matrixTrate = m_program->uniformLocation("trate");
+    Q_ASSERT(m_matrixUniform != -1);
     m_program->log();
     // Use QBasicTimer because its faster than QTimer
     timer.start(12, this);
@@ -97,6 +100,7 @@ void OpenGLWidget::initializeGL()
     auto& indxs= cube.indices;
     //!create new vector!
     int numb_of_crop=number_of_triangle_breaking(4);//12 |60|252|1020|formula: prev+6*2^(iter_num+2)
+    std::vector<float> new_vert;
     for(int i=0;i<numb_of_crop;++i){
         middle_point(indxs[i*3+0],indxs[i*3+1],&max_indx);
         middle_point(indxs[i*3+0],indxs[i*3+2],&max_indx);
@@ -119,12 +123,14 @@ void OpenGLWidget::initializeGL()
                       cube.indices.push_back(indxs[i*3+2]);
 
     }
-    for(int i=0;i<numb_of_crop;++i){
-       cube.indices[i*3+0]=0;
-       cube.indices[i*3+1]=0;
-       cube.indices[i*3+2]=0;
+    for(int i=0;i<numb_of_crop;++i)
+    {
+        cube.indices.erase(cube.indices.begin());
+        cube.indices.erase(cube.indices.begin());
+        cube.indices.erase(cube.indices.begin());
     }
     //
+   // cube.vertices=new_vert;
     vao = new QOpenGLVertexArrayObject(this);
     vao->create();
     vao->bind();
@@ -148,6 +154,9 @@ void OpenGLWidget::initializeGL()
     m_program->setAttributeBuffer(m_colAttr, GL_FLOAT, 3 * sizeof(float), 3, 6 * sizeof(float));
     //key control
     pressed_button.assign(60, false);
+   // parent()
+    //
+    begin= std::chrono::high_resolution_clock::now();
 
 }
 
@@ -196,14 +205,18 @@ void OpenGLWidget::timerEvent(QTimerEvent*)
 void OpenGLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    if(dc_state){
-    glEnable(GL_CULL_FACE);
+    if(depth_state){
     glEnable(GL_DEPTH_TEST);
-    glCullFace(GL_BACK);//GL_BACK
+    }
+    else{
+        glDisable(GL_DEPTH_TEST);
+    }
+    if(culling_state){
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);//GL_BACK
     }
     else{
         glDisable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
     }
     if(figure_fill){
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -214,12 +227,22 @@ void OpenGLWidget::paintGL()
     glShadeModel(GL_SMOOTH);
     m_program->bind();
     QMatrix4x4 matrix;
-    matrix.perspective(vertical_angle, aspectRatio, 0.1f, 100.0f);
+    matrix.perspective(vertical_angle, aspectRatio, 0.1f, 10000.0f);
+    std::vector<QMatrix4x4> trate_cont;//translate+rotate=trate
+    for(int i=0;i<nox;++i){
+        for(int j=0;j<noy;++j){
+            for(int k=0;k<noz;++k){
+            QMatrix4x4 mat1;
+            mat1.translate(-i*4, k*4, -j*4);
+            mat1.rotate(rotation);
+            mat1.rotate(180.0f - (m_xRot / 16.0f), 1, 0, 0);
+            mat1.rotate(m_yRot / 16.0f, 0, 1, 0);
+            mat1.rotate(m_zRot / 16.0f, 0, 0, 1);
+            trate_cont.push_back(mat1);
+        }
+        }
+    }
     matrix.translate(x_coord, y_coord, z_coord);
-    matrix.rotate(rotation);
-    matrix.rotate(180.0f - (m_xRot / 16.0f), 1, 0, 0);
-    matrix.rotate(m_yRot / 16.0f, 0, 1, 0);
-    matrix.rotate(m_zRot / 16.0f, 0, 0, 1);
     //keyEvent
     keyevent();
     if(color_change!=0){
@@ -236,19 +259,30 @@ void OpenGLWidget::paintGL()
     m_program->setUniformValue("radius", 2.0f);
     m_program->setUniformValue("morphForce", prop);
     m_program->setUniformValue("morph_type", morph_type);
-    //m_program->setUniformValue("color", QColor(255,0,0));
 
     vao->bind();
     arrayBuf.write(0, cube.vertices.data(), cube.vertices.size() * sizeof(float));
+    for(size_t i=0;i<nox*noy*noz;++i){
+        m_program->setUniformValue(m_matrixTrate, trate_cont[i]);
+        glDrawElements(GL_TRIANGLES, cube.indices.size(), GL_UNSIGNED_SHORT, 0);
 
-    glDrawElements(GL_TRIANGLES, cube.indices.size(), GL_UNSIGNED_SHORT, 0);
-
+    }
     vao->release();
     m_program->release();
 
     ++m_frame;
+    //fps
+    auto timet = std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::high_resolution_clock::now() - begin);
+    if(timet.count() > 0.5) {
+        begin= std::chrono::high_resolution_clock::now();
+        fps = static_cast<float>(m_frame)/timet.count();
+        m_frame=0;
+        updateFPS();
+    }
 }
-
+void OpenGLWidget::updateFPS(){
+    emit showFPS();
+}
 OpenGLWidget::~OpenGLWidget()
 {
     makeCurrent();
@@ -572,7 +606,7 @@ void OpenGLWidget::keyevent()
         int a = 0;
         int b = 0;
         int c = 0;
-        for (int i = 0; i < cube.vertices.size()/6; ++i)
+        for (int i = 0; i < 48/6; ++i)
         {
             cube.vertices[i * 6 + 5] = a;
             cube.vertices[i * 6 + 4] = b;
@@ -586,6 +620,11 @@ void OpenGLWidget::keyevent()
                     ++c;
                 }
             }
+        }
+        for(int i=48/6;i<cube.vertices.size()/6;++i){
+            cube.vertices[(i+0) * 6 + 3]=abs(cube.vertices[(i-5)*6+3]+cube.vertices[(i-6)*6+3])/2;
+            cube.vertices[(i+0) * 6 + 4]=abs(cube.vertices[(i-5)*6+4]+cube.vertices[(i-6)*6+4])/2;
+            cube.vertices[(i+0) * 6 + 5]=abs(cube.vertices[(i-5)*6+5]+cube.vertices[(i-6)*6+5])/2;
         }
     }
 }

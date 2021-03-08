@@ -7,6 +7,7 @@ out VS_OUT {
 } vs_out;
 in vec4 colAttr;
 //out vec4 colour;
+
 void main()
 {
     vs_out.baseColour = colAttr;
