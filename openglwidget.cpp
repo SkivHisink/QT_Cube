@@ -262,8 +262,8 @@ void OpenGLWidget::paintGL()
 
     vao->bind();
     arrayBuf.write(0, cube.vertices.data(), cube.vertices.size() * sizeof(float));
-    for(size_t i=0;i<nox*noy*noz;++i){
-        m_program->setUniformValue(m_matrixTrate, trate_cont[i]);
+    for(auto trate:trate_cont){
+        m_program->setUniformValue(m_matrixTrate, trate);
         glDrawElements(GL_TRIANGLES, cube.indices.size(), GL_UNSIGNED_SHORT, 0);
 
     }
@@ -273,7 +273,7 @@ void OpenGLWidget::paintGL()
     ++m_frame;
     //fps
     auto timet = std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::high_resolution_clock::now() - begin);
-    if(timet.count() > 0.5) {
+    if(timet.count() > 9.5) {
         begin= std::chrono::high_resolution_clock::now();
         fps = static_cast<float>(m_frame)/timet.count();
         m_frame=0;
